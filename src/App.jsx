@@ -1,26 +1,115 @@
 import { useState } from 'react';
+import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
+import logo from './assets/Aioon_logo-01.png';
+import logoWhite from './assets/white logo aioon.png';
+import robotImg from './assets/ROBOT.png';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isArabic, setIsArabic] = useState(false);
+  const [navbarSolid, setNavbarSolid] = useState(false);
+
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, 'change', (latest) => {
+    setNavbarSolid(latest > 80);
+  });
+
+  const translations = {
+    en: {
+      home: "Home",
+      about: "About",
+      services: "Services",
+      contact: "Contact",
+      heroTitle: "Where Technology Meets Business Vision",
+      heroDesc:
+        "Aioon Technologies delivers smart, scalable, and fully customized digital ecosystems. As Saudi Arabia’s exclusive ENZAPPS support partner, we ensure seamless integration and reliable, future-ready solutions.",
+      explore: "Let's Explore",
+    },
+    ar: {
+      home: "الرئيسية",
+      about: "من نحن",
+      services: "الخدمات",
+      contact: "اتصل بنا",
+      heroTitle: "حيث تلتقي التكنولوجيا برؤية الأعمال",
+      heroDesc:
+        "تقدم تقنيات أيون أنظمة رقمية ذكية وقابلة للتطوير ومخصصة بالكامل. كشريك دعم حصري لـ ENZAPPS في المملكة العربية السعودية، نضمن التكامل السلس والحلول الموثوقة الجاهزة للمستقبل.",
+      explore: "لنستكشف",
+    },
+  };
+
+  const lang = isArabic ? 'ar' : 'en';
+  const t = translations[lang];
+  const dir = isArabic ? 'rtl' : 'ltr';
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans antialiased">
+    <div
+      dir={dir}
+      className={`min-h-screen bg-black text-gray-100 font-sans antialiased ${isArabic ? 'font-arabic' : ''}`}
+    >
+      {/* Language Toggle */}
+      <button
+        onClick={() => setIsArabic(!isArabic)}
+        className="fixed top-6 right-8 z-50 bg-gray-800/80 text-white px-5 py-2.5 rounded-full border border-gray-600 hover:bg-gray-700 transition backdrop-blur-sm"
+      >
+        {isArabic ? 'EN' : 'عربي'}
+      </button>
+
       {/* Navbar */}
-      <nav className="bg-purple-700 text-white sticky top-0 z-50 shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">AIOON</h1>
+      <nav
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-400 ${
+          navbarSolid
+            ? 'bg-black shadow-xl border-b border-gray-800'
+            : 'bg-white border-b border-gray-200'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-4 flex justify-between items-center">
+          {/* Logo - switches to white when scrolled */}
+          <a href="/" className="flex items-center">
+            <img
+              src={navbarSolid ? logoWhite : logo}
+              alt="AIOON"
+              className="h-9 md:h-11 w-auto object-contain"
+            />
+          </a>
 
           {/* Desktop Menu */}
-          <ul className="hidden md:flex gap-8 text-lg font-medium">
-            <li className="cursor-pointer hover:text-purple-200 transition">Home</li>
-            <li className="cursor-pointer hover:text-purple-200 transition">About</li>
-            <li className="cursor-pointer hover:text-purple-200 transition">Services</li>
-            <li className="cursor-pointer hover:text-purple-200 transition">Contact</li>
+          <ul className="hidden md:flex items-center gap-10 text-lg font-medium">
+            <li
+              className={`cursor-pointer transition-colors ${
+                navbarSolid ? 'text-gray-300 hover:text-white' : 'text-gray-900 hover:text-black'
+              }`}
+            >
+              {t.home}
+            </li>
+            <li
+              className={`cursor-pointer transition-colors ${
+                navbarSolid ? 'text-gray-300 hover:text-white' : 'text-gray-900 hover:text-black'
+              }`}
+            >
+              {t.about}
+            </li>
+            <li
+              className={`cursor-pointer transition-colors ${
+                navbarSolid ? 'text-gray-300 hover:text-white' : 'text-gray-900 hover:text-black'
+              }`}
+            >
+              {t.services}
+            </li>
+            <li
+              className={`cursor-pointer transition-colors ${
+                navbarSolid ? 'text-gray-300 hover:text-white' : 'text-gray-900 hover:text-black'
+              }`}
+            >
+              {t.contact}
+            </li>
           </ul>
 
           {/* Mobile Hamburger */}
           <button
-            className="md:hidden text-3xl focus:outline-none"
+            className={`md:hidden text-3xl focus:outline-none ${
+              navbarSolid ? 'text-white' : 'text-black'
+            }`}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? '✕' : '☰'}
@@ -29,174 +118,96 @@ function App() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden bg-purple-800 py-4">
-            <ul className="flex flex-col items-center gap-6 text-lg">
-              <li className="cursor-pointer hover:text-purple-200 transition" onClick={() => setIsMenuOpen(false)}>Home</li>
-              <li className="cursor-pointer hover:text-purple-200 transition" onClick={() => setIsMenuOpen(false)}>About</li>
-              <li className="cursor-pointer hover:text-purple-200 transition" onClick={() => setIsMenuOpen(false)}>Services</li>
-              <li className="cursor-pointer hover:text-purple-200 transition" onClick={() => setIsMenuOpen(false)}>Contact</li>
+          <div className="md:hidden bg-black py-8 border-t border-gray-800">
+            <ul className="flex flex-col items-center gap-8 text-lg font-medium text-gray-200">
+              <li className="hover:text-white transition" onClick={() => setIsMenuOpen(false)}>
+                {t.home}
+              </li>
+              <li className="hover:text-white transition" onClick={() => setIsMenuOpen(false)}>
+                {t.about}
+              </li>
+              <li className="hover:text-white transition" onClick={() => setIsMenuOpen(false)}>
+                {t.services}
+              </li>
+              <li className="hover:text-white transition" onClick={() => setIsMenuOpen(false)}>
+                {t.contact}
+              </li>
             </ul>
           </div>
         )}
       </nav>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-purple-600 to-purple-800 text-white">
-        <div className="max-w-7xl mx-auto px-6 py-24 md:py-32 text-center">
-          <h2 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6">
-            Where Technology Meets Business Vision
-          </h2>
-          <p className="text-xl md:text-2xl max-w-4xl mx-auto mb-10 opacity-90">
-            Aioon Technologies delivers smart, scalable, and fully customized digital ecosystems. As Saudi Arabia’s exclusive ENZAPPS support partner, we ensure seamless integration and reliable, future-ready solutions.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-6">
-            <button className="bg-white text-purple-700 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition shadow-lg">
-              Get Started
-            </button>
-            <button className="border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-purple-700 transition">
-              Learn More
-            </button>
-          </div>
-        </div>
-      </section>
+      {/* Spacer */}
+      <div className="h-16" />
 
-      {/* About Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <h3 className="text-4xl md:text-5xl font-bold text-gray-800 text-center mb-12">Aioon Technologies</h3>
-          <p className="text-lg text-gray-700 leading-relaxed max-w-4xl mx-auto text-center mb-16">
-            Aioon Technologies, a dedicated technology partner for enterprises in the Kingdom of Saudi Arabia, specializing in advanced business software and digital transformation. At Aioon Technologies, we specialize in delivering cutting-edge solutions across both software and hardware domains, with a core focus on total integration and deep customization. Our strength lies in transforming complex business needs into seamless, scalable, and intelligent systems tailored to each client’s unique vision. We proudly serve as an exclusive support partner in the Kingdom of Saudi Arabia for leading digital transformation platforms, such as ENZAPPS Software Solutions. With over 13 years of legacy and a vast customer base across diverse industries, Aioon Technologies remains at the forefront of support wherever and whenever our customers need us most.
-          </p>
+      {/* Hero Section - with greyish-black gradient for seamless look */}
+      <section className="relative min-h-screen flex items-center overflow-hidden">
+        {/* Unified grey-black minimal gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-950 to-black"></div>
 
-          <div className="grid md:grid-cols-3 gap-10">
-            {/* Mission */}
-            <div className="bg-purple-50 p-8 rounded-2xl shadow-md hover:shadow-xl transition">
-              <h4 className="text-2xl font-bold text-purple-700 mb-4">Our Mission</h4>
-              <p className="text-gray-700">
-                To revolutionize business operations through AI-powered ERP, CRM, and automation solutions. We dive deep into your unique challenges to deliver smart, scalable technologies that simplify complexity, accelerate growth, and drive lasting impact.
-              </p>
-            </div>
+        <div className="max-w-7xl mx-auto px-6 md:px-12 grid md:grid-cols-2 gap-12 items-center relative z-10">
+          {/* Left - Text (reduced size) */}
+          <div className="text-center md:text-left">
+            <motion.h1
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9 }}
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 text-white"
+            >
+              {t.heroTitle}
+            </motion.h1>
 
-            {/* Vision */}
-            <div className="bg-purple-50 p-8 rounded-2xl shadow-md hover:shadow-xl transition">
-              <h4 className="text-2xl font-bold text-purple-700 mb-4">Our Vision</h4>
-              <p className="text-gray-700">
-                To list among Saudi Arabia's most trusted technology partners, driving performance and sustainable growth through intelligent digital solutions, fully aligned with Saudi Vision 2030.
-              </p>
-            </div>
+            <motion.p
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.2 }}
+              className="text-base md:text-lg text-gray-300 leading-relaxed max-w-2xl mx-auto md:mx-0 mb-10"
+            >
+              {t.heroDesc}
+            </motion.p>
 
-            {/* Core Values */}
-            <div className="bg-purple-50 p-8 rounded-2xl shadow-md hover:shadow-xl transition">
-              <h4 className="text-2xl font-bold text-purple-700 mb-4">Core Values</h4>
-              <ul className="text-gray-700 space-y-2">
-                <li><strong>Integrity:</strong> Building trust through transparent partnership.</li>
-                <li><strong>Innovation:</strong> Future-ready solutions powered by AI.</li>
-                <li><strong>Commitment:</strong> Dedicated to your long-term success.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Software Solutions */}
-      <section className="py-20 bg-gray-100">
-        <div className="max-w-7xl mx-auto px-6">
-          <h3 className="text-4xl font-bold text-center text-gray-800 mb-6">Core Software Solutions</h3>
-          <p className="text-xl text-gray-600 text-center mb-16 max-w-3xl mx-auto">
-            Integrated Services for Digital Transformation — A complete suite of platforms designed to boost efficiency, improve visibility, and streamline your entire business operation.
-          </p>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              { num: "01", title: "Enterprise Resource Planning (ERP)", desc: "Comprehensive management of Finance, HR, Inventory, Sales, and Manufacturing." },
-              { num: "02", title: "Customer Relationship Management (CRM)", desc: "Intelligent tools for lead management, pipeline tracking, and customer engagement." },
-              { num: "03", title: "HR & Payroll Automation", desc: "Automated workforce management, including AI-driven face-recognition attendance and precise payroll processing." },
-              { num: "04", title: "Project & Construction ERP", desc: "Tailored modules for contractors to manage budgets, resources, timelines, and progress tracking." },
-              { num: "05", title: "AI & Business Analytics", desc: "Data-driven dashboards and predictive insights across all business functions." },
-              { num: "06", title: "E-Invoicing & Compliance", desc: "Seamless ZATCA-compliant e-invoicing integration with external devices (printers, kiosks, etc.)." },
-            ].map((item) => (
-              <div
-                key={item.num}
-                className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition duration-300 group"
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.4 }}
+            >
+              <a
+                href="#"
+                className="inline-block bg-gradient-to-r from-gray-200 to-white text-black font-bold text-lg px-12 py-5 rounded-full shadow-2xl hover:shadow-xl transition-all duration-300 transform hover:scale-[1.03] border border-gray-300"
               >
-                <div className="text-5xl font-bold text-purple-200 group-hover:text-purple-500 transition mb-4">{item.num}</div>
-                <h4 className="text-2xl font-semibold text-gray-800 mb-3">{item.title}</h4>
-                <p className="text-gray-600">{item.desc}</p>
-                <a href="#" className="mt-4 inline-block text-purple-600 font-medium hover:text-purple-800 transition">Read More →</a>
-              </div>
-            ))}
+                {t.explore} →
+              </a>
+            </motion.div>
           </div>
+
+          {/* Right - Silver AI Robot */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, delay: 0.3 }}
+            className="hidden md:flex justify-center"
+          >
+            <img
+              src={robotImg}
+              alt="Silver AI Robot"
+              className="w-80 md:w-96 lg:w-[500px] object-contain drop-shadow-2xl"
+            />
+          </motion.div>
         </div>
       </section>
 
-      {/* ELV Systems */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <h3 className="text-4xl font-bold text-center text-gray-800 mb-6">ELV (Extra Low Voltage) Systems</h3>
-          <p className="text-xl text-gray-600 text-center mb-16 max-w-4xl mx-auto">
-            At Aioon Technologies, we provide end-to-end design, supply, and implementation of ELV systems that meet the diverse requirements of our clients. Our expertise spans both pre-sales consultation and post-sales support.
+      {/* Placeholder for other sections */}
+      <section className="py-24 bg-gray-950">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <h2 className="text-5xl font-bold text-white mb-12">Aioon Technologies</h2>
+          <p className="text-xl text-gray-300 max-w-4xl mx-auto">
+            Aioon Technologies, a dedicated technology partner for enterprises in the Kingdom of Saudi Arabia...
           </p>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              "Passive Networking & structured cabling",
-              "Conferencing & Meeting Hall Solutions",
-              "Audio & Visual Systems",
-              "Closed Circuit Television [CCTV] & VMS",
-              "Integrated Security Solutions",
-              "Parking Control & Parking Guidance",
-              "Access Control & E-Gates",
-              "Smart Home & Automation Systems",
-            ].map((item, index) => (
-              <div
-                key={index}
-                className="bg-purple-50 p-6 rounded-xl shadow-md hover:bg-purple-100 hover:shadow-lg transition duration-300 text-center font-medium text-gray-800"
-              >
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Contact / Enquiry */}
-      <section className="py-20 bg-gradient-to-br from-purple-700 to-purple-900 text-white">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <h3 className="text-4xl md:text-5xl font-bold mb-6">Connect With Us</h3>
-          <p className="text-xl mb-12 max-w-3xl mx-auto">
-            Start Your Digital Journey — Let’s shape the future together. We’re ready to tackle your challenges and deliver intelligent solutions that lead the way.
-          </p>
-
-          <form className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            <input type="text" placeholder="First Name" className="p-4 rounded-lg bg-white/10 border border-white/30 focus:outline-none focus:border-white placeholder-white/70" />
-            <input type="text" placeholder="Last Name" className="p-4 rounded-lg bg-white/10 border border-white/30 focus:outline-none focus:border-white placeholder-white/70" />
-            <input type="email" placeholder="Email Address" className="p-4 rounded-lg bg-white/10 border border-white/30 focus:outline-none focus:border-white placeholder-white/70 md:col-span-2" />
-            <input type="tel" placeholder="Phone Number" className="p-4 rounded-lg bg-white/10 border border-white/30 focus:outline-none focus:border-white placeholder-white/70" />
-            <textarea placeholder="Message" rows="4" className="p-4 rounded-lg bg-white/10 border border-white/30 focus:outline-none focus:border-white placeholder-white/70 md:col-span-2"></textarea>
-            <button type="submit" className="md:col-span-2 bg-white text-purple-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition shadow-lg">
-              Send Enquiry
-            </button>
-          </form>
-
-          <div className="mt-16 grid md:grid-cols-3 gap-10 text-center">
-            <div>
-              <h4 className="text-2xl font-bold mb-3">Address</h4>
-              <p className="text-lg opacity-90">Ar Rabwah Dist. Abi Al Fath Al Kateb, Riyadh - KSA</p>
-            </div>
-            <div>
-              <h4 className="text-2xl font-bold mb-3">Write us</h4>
-              <p className="text-lg opacity-90">info@aioon.sa</p>
-            </div>
-            <div>
-              <h4 className="text-2xl font-bold mb-3">Talk to Us</h4>
-              <p className="text-lg opacity-90">+966 53 514 1447<br />+966 53 509 0840</p>
-            </div>
-          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-10 text-center">
+      <footer className="bg-black border-t border-gray-800 py-12 text-center text-gray-400">
         <p>© {new Date().getFullYear()} AIOON Technologies. All rights reserved.</p>
         <p className="mt-2">Proudly supporting Saudi Vision 2030 through innovation and excellence.</p>
       </footer>
