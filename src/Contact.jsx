@@ -1,24 +1,45 @@
 // src/Contact.jsx
 import React, { useState } from "react";
-import { FiMail, FiPhone, FiMapPin, FiSend, FiClock } from "react-icons/fi";
-import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa";
+import { FiMail, FiPhone, FiMapPin, FiSend, FiClock, FiBriefcase } from "react-icons/fi";
+import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaWhatsapp } from "react-icons/fa";
 import { motion } from "framer-motion";
+import contactBgImage from "./assets/contact.png";
 
 function Contact() {
   const [form, setForm] = useState({ 
     name: "", 
     email: "", 
     phone: "",
+    company: "",
     message: "" 
   });
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(form);
-    alert("Message sent!");
-    setForm({ name: "", email: "", phone: "", message: "" });
+
+    try {
+      const res = await fetch("http://localhost:5000/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert("Message sent successfully!");
+        setForm({ name: "", email: "", phone: "", company: "", message: "" });
+      } else {
+        alert("Failed to send message. Try again.");
+      }
+    } catch (error) {
+      console.error("Frontend Error:", error);
+      alert("Server error. Please try later.");
+    }
   };
 
   // Generate animated stars
@@ -28,52 +49,37 @@ function Contact() {
     y: Math.random() * 100,
     delay: Math.random() * 5,
     duration: 2 + Math.random() * 4,
-    size: Math.random() * 1.5 + 0.5   // tiny dots
+    size: Math.random() * 1.5 + 0.5
   }));
 
   const socialMedia = [
-    { icon: FaFacebookF, color: "from-blue-500 to-blue-700", label: "Facebook" },
-    { icon: FaTwitter, color: "from-blue-400 to-cyan-500", label: "Twitter" },
-    { icon: FaInstagram, color: "from-pink-500 to-purple-600", label: "Instagram" },
-    { icon: FaLinkedinIn, color: "from-blue-600 to-blue-800", label: "LinkedIn" }
+    { icon: FaFacebookF, color: "from-[#dc2626] to-[#ef4444]", label: "Facebook", url: "#" },
+    { icon: FaTwitter, color: "from-[#dc2626] to-[#ef4444]", label: "Twitter", url: "#" },
+    { icon: FaInstagram, color: "from-[#dc2626] to-[#ef4444]", label: "Instagram", url: "#" },
+    { icon: FaLinkedinIn, color: "from-[#dc2626] to-[#ef4444]", label: "LinkedIn", url: "#" }
   ];
 
+  // WhatsApp number - replace with your actual business WhatsApp number
+  const whatsappNumber = "+966535141447";
+  const whatsappMessage = "Hello! I'm interested in your services.";
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white relative overflow-hidden">
-      {/* Animated Background Effects */}
-      
-      {/* Rotating Purple Circle */}
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px]"
-        animate={{
-          rotate: 360,
-        }}
-        transition={{
-          duration: 60,
-          repeat: Infinity,
-          ease: "linear"
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Full Background Image with Overlay */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${contactBgImage})`,
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-transparent to-purple-500/10 rounded-full blur-3xl"></div>
-      </motion.div>
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-black/70"></div>
+      </div>
 
-      {/* Secondary rotating circle */}
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px]"
-        animate={{
-          rotate: -360,
-        }}
-        transition={{
-          duration: 80,
-          repeat: Infinity,
-          ease: "linear"
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-600/5 via-transparent to-blue-500/5 rounded-full blur-2xl"></div>
-      </motion.div>
+      {/* Floating WhatsApp Icon - REMOVED FROM HERE */}
 
-      {/* Animated Sparkle/Stars - sprinkling effect */}
-      <div className="absolute inset-0 overflow-hidden">
+      {/* Animated Stars */}
+      <div className="absolute inset-0 overflow-hidden z-0">
         {stars.map((star) => (
           <motion.div
             key={star.id}
@@ -83,11 +89,10 @@ function Contact() {
               top: `${star.y}%`,
               width: `${star.size}px`,
               height: `${star.size}px`,
-              boxShadow: '0 0 4px 1px rgba(255, 255, 255, 0.6)'
-
+              boxShadow: '0 0 4px 1px rgba(255, 255, 255, 0.3)'
             }}
             animate={{
-              opacity: [0, 1, 0],
+              opacity: [0, 0.6, 0],
               scale: [0, 1, 0],
             }}
             transition={{
@@ -100,7 +105,7 @@ function Contact() {
         ))}
       </div>
 
-      {/* Main Content - Starting directly with Contact Us */}
+      {/* Main Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         {/* Contact Us Heading Section */}
         <motion.div
@@ -112,7 +117,7 @@ function Contact() {
           <h2 className="text-5xl md:text-6xl font-bold mb-8 text-center">
             <span className="relative">
               <span className="text-white">Contact Us</span>
-              <span className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent 
+              <span className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#dc2626] to-transparent 
                     blur-sm opacity-70"></span>
             </span>
           </h2>
@@ -129,12 +134,12 @@ function Contact() {
             <div className="absolute -inset-1 rounded-2xl overflow-hidden">
               {/* Top border animation */}
               <motion.div
-                className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-purple-400 to-transparent"
+                className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#dc2626] to-transparent"
                 animate={{
                   background: [
-                    'linear-gradient(to right, transparent, #a855f7, transparent)',
-                    'linear-gradient(to right, transparent, #3b82f6, transparent)',
-                    'linear-gradient(to right, transparent, #a855f7, transparent)',
+                    'linear-gradient(to right, transparent, #dc2626, transparent)',
+                    'linear-gradient(to right, transparent, #ffffff, transparent)',
+                    'linear-gradient(to right, transparent, #dc2626, transparent)',
                   ],
                   opacity: [0.7, 1, 0.7],
                 }}
@@ -147,12 +152,12 @@ function Contact() {
               
               {/* Right border animation */}
               <motion.div
-                className="absolute top-0 right-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-blue-400 to-transparent"
+                className="absolute top-0 right-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-[#ffffff] to-transparent"
                 animate={{
                   background: [
-                    'linear-gradient(to bottom, transparent, #3b82f6, transparent)',
-                    'linear-gradient(to bottom, transparent, #a855f7, transparent)',
-                    'linear-gradient(to bottom, transparent, #3b82f6, transparent)',
+                    'linear-gradient(to bottom, transparent, #ffffff, transparent)',
+                    'linear-gradient(to bottom, transparent, #dc2626, transparent)',
+                    'linear-gradient(to bottom, transparent, #ffffff, transparent)',
                   ],
                   opacity: [0.7, 1, 0.7],
                 }}
@@ -166,12 +171,12 @@ function Contact() {
               
               {/* Bottom border animation */}
               <motion.div
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-purple-400 to-transparent"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#dc2626] to-transparent"
                 animate={{
                   background: [
-                    'linear-gradient(to right, transparent, #3b82f6, transparent)',
-                    'linear-gradient(to right, transparent, #a855f7, transparent)',
-                    'linear-gradient(to right, transparent, #3b82f6, transparent)',
+                    'linear-gradient(to right, transparent, #ffffff, transparent)',
+                    'linear-gradient(to right, transparent, #dc2626, transparent)',
+                    'linear-gradient(to right, transparent, #ffffff, transparent)',
                   ],
                   opacity: [0.7, 1, 0.7],
                 }}
@@ -185,12 +190,12 @@ function Contact() {
               
               {/* Left border animation */}
               <motion.div
-                className="absolute top-0 left-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-blue-400 to-transparent"
+                className="absolute top-0 left-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-[#ffffff] to-transparent"
                 animate={{
                   background: [
-                    'linear-gradient(to bottom, transparent, #a855f7, transparent)',
-                    'linear-gradient(to bottom, transparent, #3b82f6, transparent)',
-                    'linear-gradient(to bottom, transparent, #a855f7, transparent)',
+                    'linear-gradient(to bottom, transparent, #dc2626, transparent)',
+                    'linear-gradient(to bottom, transparent, #ffffff, transparent)',
+                    'linear-gradient(to bottom, transparent, #dc2626, transparent)',
                   ],
                   opacity: [0.7, 1, 0.7],
                 }}
@@ -203,67 +208,87 @@ function Contact() {
               />
               
               {/* Glow effect around the border */}
-              <div className="absolute -inset-2 rounded-2xl bg-gradient-to-r from-purple-500/10 to-blue-500/10 blur-xl opacity-50"></div>
+              <div className="absolute -inset-2 rounded-2xl bg-gradient-to-r from-[#dc2626]/20 to-white/20 blur-xl opacity-50"></div>
             </div>
 
-            {/* Main Form Container */}
+            {/* Main Form Container - Transparent with blur */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 relative z-10"
+              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 relative z-10 shadow-2xl"
             >
-              <h3 className="text-2xl font-bold mb-2 text-center">Send us a Message</h3>
+              <h3 className="text-2xl font-bold mb-2 text-center text-white">Send us a Message</h3>
               <p className="text-gray-300 mb-6 text-center">Fill out the form below and we'll get back to you shortly.</p>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-gray-300 mb-2 text-sm font-medium">Full Name *</label>
+                  <label className="block text-gray-200 mb-2 text-sm font-medium">Full Name *</label>
                   <input
                     type="text"
                     name="name"
                     value={form.name}
                     onChange={handleChange}
                     placeholder="Your name"
-                    className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-lg focus:outline-none focus:border-purple-500 text-white placeholder-gray-500 transition-all duration-300"
+                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:border-[#dc2626] text-white placeholder-white/50 transition-all duration-300"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-gray-300 mb-2 text-sm font-medium">Email Address *</label>
+                  <label className="block text-gray-200 mb-2 text-sm font-medium">Email Address *</label>
                   <input
                     type="email"
                     name="email"
                     value={form.email}
                     onChange={handleChange}
                     placeholder="you@example.com"
-                    className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-lg focus:outline-none focus:border-purple-500 text-white placeholder-gray-500 transition-all duration-300"
+                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:border-[#dc2626] text-white placeholder-white/50 transition-all duration-300"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-gray-300 mb-2 text-sm font-medium">Phone Number</label>
+                  <label className="block text-gray-200 mb-2 text-sm font-medium">Phone Number</label>
                   <input
                     type="tel"
                     name="phone"
                     value={form.phone}
                     onChange={handleChange}
                     placeholder="Your phone number"
-                    className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-lg focus:outline-none focus:border-purple-500 text-white placeholder-gray-500 transition-all duration-300"
+                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:border-[#dc2626] text-white placeholder-white/50 transition-all duration-300"
                   />
                 </div>
 
+                {/* Company Name Field */}
                 <div>
-                  <label className="block text-gray-300 mb-2 text-sm font-medium">Message *</label>
+                  <label className="block text-gray-200 mb-2 text-sm font-medium">
+                    Company Name <span className="text-gray-400 text-xs">(Optional)</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <FiBriefcase className="text-white/50" />
+                    </div>
+                    <input
+                      type="text"
+                      name="company"
+                      value={form.company}
+                      onChange={handleChange}
+                      placeholder="Your company name"
+                      className="w-full pl-10 pr-4 py-3 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:border-[#dc2626] text-white placeholder-white/50 transition-all duration-300"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-gray-200 mb-2 text-sm font-medium">Message *</label>
                   <textarea
                     name="message"
                     value={form.message}
                     onChange={handleChange}
                     rows="5"
                     placeholder="Tell us about your project or inquiry..."
-                    className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-lg focus:outline-none focus:border-purple-500 text-white placeholder-gray-500 resize-none transition-all duration-300"
+                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:border-[#dc2626] text-white placeholder-white/50 resize-none transition-all duration-300"
                     required
                   />
                 </div>
@@ -272,9 +297,8 @@ function Contact() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
-                  className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-purple-900/30 relative overflow-hidden group"
+                  className="w-full py-3.5 bg-gradient-to-r from-[#dc2626] to-[#ef4444] hover:from-[#b91c1c] hover:to-[#dc2626] text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-[#dc2626]/30 relative overflow-hidden group"
                 >
-                  {/* Button shine effect */}
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                     animate={{
@@ -291,8 +315,8 @@ function Contact() {
                 </motion.button>
               </form>
 
-              <div className="mt-8 pt-8 border-t border-white/10">
-                <p className="text-gray-400 text-sm text-center">
+              <div className="mt-8 pt-8 border-t border-white/20">
+                <p className="text-gray-300 text-sm text-center">
                   By submitting this form, you agree to our privacy policy and terms of service.
                   We'll never share your information with third parties.
                 </p>
@@ -301,97 +325,118 @@ function Contact() {
           </div>
         </div>
 
-        {/* 4 CONTACT BOXES - IMPROVED LAYOUT */}
-        {/* Hover Cards with Minimal Border */}
-<motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.6, delay: 0.4 }}
-  className="mb-20"
->
-  <div className="grid md:grid-cols-2 gap-6">
-    {/* Email */}
-    <div className="p-4 hover:bg-white/5 transition-all duration-300 rounded-lg hover:border-l-2 hover:border-l-purple-500">
-      <div className="flex items-start gap-4">
-        <div className="p-2 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-lg">
-          <FiMail className="w-5 h-5 text-purple-400" />
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-1 text-white">Email Us</h3>
-          <a 
-            href="mailto:info@aioon.sa" 
-            className="text-gray-300 hover:text-purple-300 transition-colors block"
-          >
-            info@aioon.sa
-          </a>
-          <p className="text-sm text-purple-300 mt-1">We'll respond within 24 hours</p>
-        </div>
-      </div>
-    </div>
+        {/* 4 CONTACT BOXES - Updated with WhatsApp icon positioned at bottom right of Business Hours box */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="mb-20 relative"
+        >
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Email */}
+            <div className="p-4 hover:bg-white/10 transition-all duration-300 rounded-lg hover:border-l-2 hover:border-l-[#dc2626] bg-white/5 backdrop-blur-sm">
+              <div className="flex items-start gap-4">
+                <div className="p-2 bg-gradient-to-br from-[#dc2626]/20 to-white/10 rounded-lg">
+                  <FiMail className="w-5 h-5 text-[#dc2626]" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-1 text-white">Email Us</h3>
+                  <a 
+                    href="mailto:info@aioon.sa" 
+                    className="text-gray-300 hover:text-[#dc2626] transition-colors block"
+                  >
+                    info@aioon.sa
+                  </a>
+                  <p className="text-sm text-[#dc2626] mt-1">We'll respond as soon as possible</p>
+                </div>
+              </div>
+            </div>
 
-    {/* Phone */}
-    <div className="p-4 hover:bg-white/5 transition-all duration-300 rounded-lg hover:border-l-2 hover:border-l-blue-500">
-      <div className="flex items-start gap-4">
-        <div className="p-2 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-lg">
-          <FiPhone className="w-5 h-5 text-blue-400" />
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-1 text-white">Call Us</h3>
-          <a 
-            href="tel:+966535141447" 
-            className="text-gray-300 hover:text-blue-300 transition-colors block"
-          >
-            +966 53 514 1447
-          </a>
-          <a 
-            href="tel:+966535090840" 
-            className="text-gray-300 hover:text-blue-300 transition-colors block"
-          >
-            +966 53 509 0840
-          </a>
-        </div>
-      </div>
-    </div>
+            {/* Phone */}
+            <div className="p-4 hover:bg-white/10 transition-all duration-300 rounded-lg hover:border-l-2 hover:border-l-gray-300 bg-white/5 backdrop-blur-sm">
+              <div className="flex items-start gap-4">
+                <div className="p-2 bg-gradient-to-br from-white/10 to-[#dc2626]/10 rounded-lg">
+                  <FiPhone className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-1 text-white">Call Us</h3>
+                  <a 
+                    href="tel:+966535141447" 
+                    className="text-gray-300 hover:text-[#dc2626] transition-colors block"
+                  >
+                    +966 53 514 1447
+                  </a>
+                  <a 
+                    href="tel:+966535090840" 
+                    className="text-gray-300 hover:text-[#dc2626] transition-colors block"
+                  >
+                    +966 53 509 0840
+                  </a>
+                </div>
+              </div>
+            </div>
 
-    {/* Address */}
-    <div className="p-4 hover:bg-white/5 transition-all duration-300 rounded-lg hover:border-l-2 hover:border-l-purple-500">
-      <div className="flex items-start gap-4">
-        <div className="p-2 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-lg">
-          <FiMapPin className="w-5 h-5 text-purple-400" />
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-1 text-white">Address</h3>
-          <p className="text-gray-300">Ar Rabwah Dist. Abi Al Fath Al Kateb</p>
-          <p className="text-gray-300">Riyadh, Saudi Arabia</p>
-        </div>
-      </div>
-    </div>
+            {/* Address */}
+            <div className="p-4 hover:bg-white/10 transition-all duration-300 rounded-lg hover:border-l-2 hover:border-l-[#dc2626] bg-white/5 backdrop-blur-sm">
+              <div className="flex items-start gap-4">
+                <div className="p-2 bg-gradient-to-br from-[#dc2626]/20 to-white/10 rounded-lg">
+                  <FiMapPin className="w-5 h-5 text-[#dc2626]" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-1 text-white">Address</h3>
+                  <p className="text-gray-300">Ar Rabwah Dist. Abi Al Fath Al Kateb</p>
+                  <p className="text-gray-300">Riyadh, Saudi Arabia</p>
+                </div>
+              </div>
+            </div>
 
-    {/* Business Hours - Simplified */}
-    {/* Business Hours - Inline with Colon */}
-<div className="p-4 hover:bg-white/5 transition-all duration-300 rounded-lg hover:border-l-2 hover:border-l-purple-500">
-  <div className="flex items-start gap-4">
-    <div className="p-2 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-lg">
-      <FiClock className="w-5 h-5 text-purple-400" />
-    </div>
-    <div className="flex-1">
-      <h3 className="text-lg font-semibold mb-2 text-white">Business Hours</h3>
-      <div className="flex items-baseline gap-2">
-        <span className="text-gray-300">Sunday - Thursday</span>
-        <span className="text-purple-300 font-medium">9:00 AM - 6:00 PM</span>
-      </div>
-    </div>
-  </div>
-</div>
-  </div>
-</motion.div>
+            {/* Business Hours - Now with relative positioning for WhatsApp icon */}
+            <div className="relative p-4 hover:bg-white/10 transition-all duration-300 rounded-lg hover:border-l-2 hover:border-l-gray-300 bg-white/5 backdrop-blur-sm">
+              <div className="flex items-start gap-4">
+                <div className="p-2 bg-gradient-to-br from-white/10 to-[#dc2626]/10 rounded-lg">
+                  <FiClock className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold mb-2 text-white">Business Hours</h3>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-gray-300">Sunday - Thursday</span>
+                    <span className="text-[#dc2626] font-medium">9:00 AM - 6:00 PM</span>
+                  </div>
+                </div>
+              </div>
 
-        {/* Social Media Section with ORIGINAL ICONS */}
+              {/* WhatsApp Icon positioned at bottom right outside the box */}
+              <motion.a
+                href={`https://wa.me/${whatsappNumber.replace(/\+/g, '')}?text=${encodeURIComponent(whatsappMessage)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute -bottom-16 -right-1 z-20 group"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {/* Glow effect */}
+                <div className="absolute inset-0 bg-[#25D366] opacity-20 group-hover:opacity-30 blur-xl rounded-full"></div>
+                {/* Icon container */}
+                <div className="relative bg-gradient-to-br from-[#25D366] to-[#128C7E] p-3.5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+                  <FaWhatsapp className="w-6 h-6 text-white" />
+                </div>
+                {/* Tooltip on hover */}
+                <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-sm py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                  Chat on WhatsApp
+                </span>
+              </motion.a>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Social Media Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-20 pt-12 border-t border-white/10 text-center"
+          className="mt-20 pt-12 border-t border-white/20 text-center"
         >
           <h3 className="text-2xl font-semibold text-white mb-6">Connect With Us</h3>
           <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
@@ -402,17 +447,19 @@ function Contact() {
             {socialMedia.map((social, index) => (
               <motion.a 
                 key={index}
-                href="#" 
+                href={social.url}
                 className="group relative"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${social.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl rounded-full`}></div>
                 <motion.div 
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.5 + index * 0.1 }}
-                  className={`relative p-4 bg-gradient-to-br ${social.color} rounded-xl border border-white/10 hover:border-white/30 transition-all duration-300`}
+                  className={`relative p-4 bg-gradient-to-br ${social.color} rounded-xl border border-white/20 hover:border-[#dc2626]/30 transition-all duration-300 text-white`}
                 >
                   <social.icon className="w-6 h-6" />
                 </motion.div>
@@ -425,11 +472,11 @@ function Contact() {
           </p>
         </motion.div>
 
-        {/* CLEANED FOOTER - Simple and minimal */}
-        <footer className="mt-12 pt-8 border-t border-white/10">
+        {/* Footer */}
+        <footer className="mt-12 pt-8 border-t border-white/20">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-center md:text-left">
-              <div className="text-2xl font-bold mb-1 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              <div className="text-2xl font-bold mb-1 bg-gradient-to-r from-white to-[#dc2626] bg-clip-text text-transparent">
                 AIOON
               </div>
               <p className="text-gray-400 text-sm">
@@ -437,22 +484,22 @@ function Contact() {
               </p>
             </div>
             
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-400">
               © {new Date().getFullYear()} AIOON Technologies. All rights reserved.
             </div>
           </div>
           
           {/* Simple contact info in footer */}
-          <div className="mt-6 pt-6 border-t border-white/10 text-center md:text-left">
+          <div className="mt-6 pt-6 border-t border-white/20 text-center md:text-left">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-gray-400 text-sm">
                 Riyadh, Saudi Arabia • 
-                <a href="mailto:info@aioon.sa" className="hover:text-purple-300 transition-colors"> info@aioon.sa</a> • 
-                <a href="tel:+966535141447" className="hover:text-purple-300 transition-colors"> +966 53 514 1447</a>
+                <a href="mailto:info@aioon.sa" className="hover:text-[#dc2626] transition-colors"> info@aioon.sa</a> • 
+                <a href="tel:+966535141447" className="hover:text-[#dc2626] transition-colors"> +966 53 514 1447</a>
               </p>
               <div className="flex gap-4">
                 {socialMedia.map((social, index) => (
-                  <a key={index} href="#" className="text-gray-400 hover:text-purple-300 transition-colors">
+                  <a key={index} href={social.url} className="text-gray-400 hover:text-[#dc2626] transition-colors" target="_blank" rel="noopener noreferrer">
                     <social.icon className="w-4 h-4" />
                   </a>
                 ))}
