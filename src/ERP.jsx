@@ -29,7 +29,7 @@ import {
   FaCrown
 } from "react-icons/fa";
 import { motion } from "framer-motion";
-import enterpriseImage from "./assets/enterprise.png";
+import erp1Image from "./assets/erp1.png";
 import { Link } from 'react-router-dom';
 
 function ERP() {
@@ -43,6 +43,10 @@ function ERP() {
     size: Math.random() * 1.5 + 0.5
   }));
 
+  // WhatsApp configuration
+  const whatsappNumber = "966535141447"; // Saudi Arabia number
+  const whatsappMessage = "Hello! I'm interested in booking a demo for your ERP solution. Can you please provide more information?";
+
   // Service data
   const service = {
     id: 1,
@@ -50,7 +54,7 @@ function ERP() {
     subtitle: "ERP",
     description: "Eliminate operational silos and unlock data-driven insights. Manage your capital, people, and processes from a single, integrated command center.",
     gradient: "from-[#dc2626] to-[#ef4444]",
-    imageUrl: enterpriseImage,
+    imageUrl: erp1Image,
     fullDescription: "Unifying Your Business Operations for Scalable Growth. In today's fast-paced market, relying on disconnected spreadsheets and legacy software creates data silos that stifle innovation. Our Enterprise Resource Planning (ERP) solutions bridge these gaps by consolidating your critical business functions into one seamless, intelligent ecosystem. We help organizations transition from fragmented tools to a single 'source of truth.' By integrating Finance, HR, Inventory, Sales, and Manufacturing, we empower your leadership team to make data-driven decisions with absolute confidence. Our ERP systems go beyond simple record-keeping; they automate complex workflows, ensure regulatory compliance, and provide real-time visibility into every corner of your enterprise. Whether you are looking to optimize production costs, streamline payroll, or accelerate growth, our ERP solution is built for scalability.",
     longDescription: "Our ERP solution is designed for businesses of all sizes, from SMEs to large enterprises. With modular architecture, you can start with the modules you need and scale as your business grows. The system offers real-time analytics, mobile accessibility, and seamless integration with third-party applications. Our implementation team ensures smooth transition from your legacy systems with minimal disruption to your daily operations.",
     features: [
@@ -153,6 +157,13 @@ function ERP() {
     ]
   };
 
+  // Function to handle WhatsApp click
+  const handleWhatsAppClick = () => {
+    const encodedMessage = encodeURIComponent(whatsappMessage);
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white relative overflow-hidden">
       {/* Animated Background Effects */}
@@ -217,7 +228,7 @@ function ERP() {
           </Link>
         </motion.div>
 
-        {/* Hero Section with Image */}
+        {/* Hero Section with Image - Small ERP text REMOVED */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -232,14 +243,7 @@ function ERP() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent"></div>
             
-            {/* Service Badge */}
-            <div className="absolute top-8 left-8">
-              <div className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-gray-200">
-                <span className={`text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r ${service.gradient}`}>
-                  {service.subtitle}
-                </span>
-              </div>
-            </div>
+            {/* REMOVED: Service Badge section with small "ERP" text */}
 
             {/* Title and Description */}
             <div className="absolute bottom-8 left-8 right-8">
@@ -328,8 +332,6 @@ function ERP() {
           </div>
         </motion.div>
 
-       
-
         {/* Features List */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -352,7 +354,7 @@ function ERP() {
           </div>
         </motion.div>
 
-        {/* CTA Section */}
+        {/* CTA Section - Updated with WhatsApp buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -368,19 +370,22 @@ function ERP() {
               Get started with {service.title} today and experience the difference.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/contact"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group"
+              {/* Book a Demo button - Opens WhatsApp */}
+              <button
+                onClick={handleWhatsAppClick}
+                className="inline-flex items-center gap-2 px-8 py-4 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group cursor-pointer"
               >
                 <span>Book a Demo</span>
                 <FiArrowRight className="group-hover:translate-x-1 transition-transform w-5 h-5" />
-              </a>
-              <a
-                href="/contact"
-                className="px-8 py-4 bg-transparent border-2 border-gray-200 hover:border-[#dc2626] text-gray-700 hover:text-[#dc2626] font-semibold rounded-xl transition-all duration-300"
+              </button>
+              
+              {/* Contact Sales button - Also opens WhatsApp */}
+              <button
+                onClick={handleWhatsAppClick}
+                className="px-8 py-4 bg-transparent border-2 border-gray-200 hover:border-[#dc2626] text-gray-700 hover:text-[#dc2626] font-semibold rounded-xl transition-all duration-300 cursor-pointer"
               >
                 Contact Sales
-              </a>
+              </button>
             </div>
           </div>
         </motion.div>

@@ -52,6 +52,10 @@ function Construction() {
     size: Math.random() * 1.5 + 0.5
   }));
 
+  // WhatsApp configuration
+  const whatsappNumber = "966535141447"; // Saudi Arabia number
+  const whatsappMessage = "Hello! I'm interested in booking a demo for your Project & Construction ERP solution. Can you please provide more information?";
+
   // Service data
   const service = {
     id: 4,
@@ -167,6 +171,13 @@ function Construction() {
     ]
   };
 
+  // Function to handle WhatsApp click
+  const handleWhatsAppClick = () => {
+    const encodedMessage = encodeURIComponent(whatsappMessage);
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white relative overflow-hidden">
       {/* Animated Background Effects */}
@@ -231,7 +242,7 @@ function Construction() {
           </Link>
         </motion.div>
 
-        {/* Hero Section with Image */}
+        {/* Hero Section with Image - Small Construction text REMOVED */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -246,14 +257,7 @@ function Construction() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent"></div>
             
-            {/* Service Badge */}
-            <div className="absolute top-8 left-8">
-              <div className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-gray-200">
-                <span className={`text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r ${service.gradient}`}>
-                  {service.subtitle}
-                </span>
-              </div>
-            </div>
+            {/* REMOVED: Service Badge section with small "Construction" text */}
 
             {/* Title and Description */}
             <div className="absolute bottom-8 left-8 right-8">
@@ -364,7 +368,7 @@ function Construction() {
           </div>
         </motion.div>
 
-        {/* CTA Section */}
+        {/* CTA Section - Updated with WhatsApp buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -380,19 +384,22 @@ function Construction() {
               Get started with {service.title} today and master your construction projects.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/contact"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group"
+              {/* Schedule a Site Demo button - Opens WhatsApp */}
+              <button
+                onClick={handleWhatsAppClick}
+                className="inline-flex items-center gap-2 px-8 py-4 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group cursor-pointer"
               >
                 <span>Schedule a Site Demo</span>
                 <FiArrowRight className="group-hover:translate-x-1 transition-transform w-5 h-5" />
-              </a>
-              <a
-                href="/contact"
-                className="px-8 py-4 bg-transparent border-2 border-gray-200 hover:border-[#dc2626] text-gray-700 hover:text-[#dc2626] font-semibold rounded-xl transition-all duration-300"
+              </button>
+              
+              {/* Contact Sales button - Also opens WhatsApp */}
+              <button
+                onClick={handleWhatsAppClick}
+                className="px-8 py-4 bg-transparent border-2 border-gray-200 hover:border-[#dc2626] text-gray-700 hover:text-[#dc2626] font-semibold rounded-xl transition-all duration-300 cursor-pointer"
               >
                 Contact Sales
-              </a>
+              </button>
             </div>
           </div>
         </motion.div>

@@ -57,9 +57,6 @@ import { motion } from "framer-motion";
 import { Link } from 'react-router-dom';
 import complianceImage from "./assets/compliance.png";
 
-// Use Unsplash image for E-Invoicing
-const einvoicingImage = "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80";
-
 function EInvoicing() {
   // Generate animated stars
   const stars = Array.from({ length: 40 }).map((_, i) => ({
@@ -70,6 +67,10 @@ function EInvoicing() {
     duration: 2 + Math.random() * 4,
     size: Math.random() * 1.5 + 0.5
   }));
+
+  // WhatsApp configuration
+  const whatsappNumber = "966535141447"; // Saudi Arabia number
+  const whatsappMessage = "Hello! I'm interested in checking my ZATCA compliance status for your E-Invoicing solution. Can you please provide more information?";
 
   // Service data
   const service = {
@@ -186,6 +187,13 @@ function EInvoicing() {
     ]
   };
 
+  // Function to handle WhatsApp click
+  const handleWhatsAppClick = () => {
+    const encodedMessage = encodeURIComponent(whatsappMessage);
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white relative overflow-hidden">
       {/* Animated Background Effects */}
@@ -250,7 +258,7 @@ function EInvoicing() {
           </Link>
         </motion.div>
 
-        {/* Hero Section with Image */}
+        {/* Hero Section with Image - Small E-Invoicing text REMOVED */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -265,14 +273,7 @@ function EInvoicing() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent"></div>
             
-            {/* Service Badge */}
-            <div className="absolute top-8 left-8">
-              <div className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-gray-200">
-                <span className={`text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r ${service.gradient}`}>
-                  {service.subtitle}
-                </span>
-              </div>
-            </div>
+            {/* REMOVED: Service Badge section with small "E-Invoicing" text */}
 
             {/* Title and Description */}
             <div className="absolute bottom-8 left-8 right-8">
@@ -361,8 +362,6 @@ function EInvoicing() {
           </div>
         </motion.div>
 
-        
-
         {/* Features List */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -385,7 +384,7 @@ function EInvoicing() {
           </div>
         </motion.div>
 
-        {/* CTA Section */}
+        {/* CTA Section - Updated with WhatsApp buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -401,19 +400,22 @@ function EInvoicing() {
               Check your ZATCA compliance status today and avoid penalties.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/contact"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group"
+              {/* Check Your Compliance button - Opens WhatsApp */}
+              <button
+                onClick={handleWhatsAppClick}
+                className="inline-flex items-center gap-2 px-8 py-4 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group cursor-pointer"
               >
                 <span>Check Your Compliance</span>
                 <FiArrowRight className="group-hover:translate-x-1 transition-transform w-5 h-5" />
-              </a>
-              <a
-                href="/contact"
-                className="px-8 py-4 bg-transparent border-2 border-gray-200 hover:border-[#dc2626] text-gray-700 hover:text-[#dc2626] font-semibold rounded-xl transition-all duration-300"
+              </button>
+              
+              {/* Contact Sales button - Also opens WhatsApp */}
+              <button
+                onClick={handleWhatsAppClick}
+                className="px-8 py-4 bg-transparent border-2 border-gray-200 hover:border-[#dc2626] text-gray-700 hover:text-[#dc2626] font-semibold rounded-xl transition-all duration-300 cursor-pointer"
               >
                 Contact Sales
-              </a>
+              </button>
             </div>
           </div>
         </motion.div>
