@@ -10,7 +10,7 @@ import AIAnalytics from "./AIAnalytics";
 import EInvoicing from "./EInvoicing";
 import Contact from "./Contact";
 
-function App() {
+function Site() {
   return (
     <Routes>
       {/* Main Services Page */}
@@ -30,4 +30,4 @@ function App() {
   );
 }
 
-export default App;
+export default Site;
