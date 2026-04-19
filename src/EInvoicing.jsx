@@ -1,86 +1,209 @@
-// src/EInvoicing.jsx
-import React from "react";
-import { 
-  FiArrowRight,
-  FiCheckCircle,
-  FiUsers,
-  FiPackage,
-  FiBarChart2,
-  FiFileText,
-  FiPrinter,
-  FiHome,
-  FiTruck,
-  FiDollarSign,
-  FiCreditCard,
-  FiHardDrive,
-  FiGrid,
-  FiTrendingUp,
-  FiShield,
-  FiAward,
-  FiStar,
-  FiClock,
-  FiCalendar,
-  FiMapPin,
-  FiMail,
-  FiPhone,
-  FiActivity,
-  FiPieChart,
-  FiLock,
-  FiDownload,
-  FiUpload,
-  FiServer
+// src/pages/EInvoicing.jsx
+import React, { useEffect, useRef, useState } from "react";
+import {
+  FiArrowRight, FiCheckCircle, FiShield, FiServer,
+  FiFileText, FiClock, FiMapPin, FiMail, FiPhone,
 } from "react-icons/fi";
-import { 
-  FaBrain,
-  FaHeadset,
-  FaRocket,
-  FaCrown,
-  FaRegBuilding,
-  FaHardHat,
-  FaChartLine,
-  FaTools,
-  FaTruckLoading,
-  FaRobot,
-  FaCloudUploadAlt,
-  FaChartPie,
-  FaChartBar,
-  FaProjectDiagram,
-  FaServer,
-  FaQrcode,
-  FaPrint,
-  FaCashRegister,
-  FaFileInvoice,
-  FaShieldAlt,
-  FaDatabase
+import {
+  FaRocket, FaFileInvoice, FaPrint, FaChartLine,
+  FaShieldAlt, FaProjectDiagram,
 } from "react-icons/fa";
-import { motion } from "framer-motion";
-import { Link } from 'react-router-dom';
+import { motion, useInView, useScroll, useSpring, useMotionValue, useTransform } from "framer-motion";
 import complianceImage from "./assets/compliance.png";
+import { Link } from "react-router-dom";
 
-function EInvoicing() {
-  // Generate animated stars
-  const stars = Array.from({ length: 40 }).map((_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    delay: Math.random() * 5,
-    duration: 2 + Math.random() * 4,
-    size: Math.random() * 1.5 + 0.5
-  }));
+/* ─── Counter ─────────────────────────────── */
+function Counter({ value }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+  const [display, setDisplay] = useState("0");
+  useEffect(() => {
+    if (!isInView) return;
+    const numeric = parseFloat(value.replace(/[^0-9.]/g, ""));
+    const suffix = value.replace(/[0-9.]/g, "");
+    const steps = 50;
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      const eased = 1 - Math.pow(1 - step / steps, 3);
+      const current = numeric * eased;
+      const formatted = value.includes(".") ? current.toFixed(1) : Math.floor(current);
+      setDisplay(`${formatted}${suffix}`);
+      if (step >= steps) clearInterval(timer);
+    }, 1600 / steps);
+    return () => clearInterval(timer);
+  }, [isInView, value]);
+  return <span ref={ref}>{display}</span>;
+}
 
-  // WhatsApp configuration
-  const whatsappNumber = "966535141447"; // Saudi Arabia number
+/* ─── FadeUp ──────────────────────────────── */
+function FadeUp({ children, delay = 0, className = "" }) {
+  return (
+    <motion.div className={className}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}>
+      {children}
+    </motion.div>
+  );
+}
+
+/* ─── Infinite Marquee Modules ────────────── */
+function InfiniteModules({ modules }) {
+  const trackRef = useRef(null);
+  const x = useMotionValue(0);
+  const animRef = useRef(null);
+  const CARD_W = 300;
+  const GAP = 24;
+  const TOTAL = (CARD_W + GAP) * modules.length;
+
+  useEffect(() => {
+    let paused = false;
+    const SPEED = 1.5;
+    const step = () => {
+      if (!paused) {
+        const current = x.get();
+        const next = current - SPEED;
+        x.set(next <= -TOTAL ? 0 : next);
+      }
+      animRef.current = requestAnimationFrame(step);
+    };
+    animRef.current = requestAnimationFrame(step);
+    const el = trackRef.current;
+    const pause = () => { paused = true; };
+    const resume = () => { paused = false; };
+    el?.addEventListener("mouseenter", pause);
+    el?.addEventListener("mouseleave", resume);
+    el?.addEventListener("touchstart", pause);
+    el?.addEventListener("touchend", resume);
+    return () => {
+      cancelAnimationFrame(animRef.current);
+      el?.removeEventListener("mouseenter", pause);
+      el?.removeEventListener("mouseleave", resume);
+      el?.removeEventListener("touchstart", pause);
+      el?.removeEventListener("touchend", resume);
+    };
+  }, [TOTAL]);
+
+  const doubled = [...modules, ...modules];
+  return (
+    <div className="overflow-hidden w-full" ref={trackRef}>
+      <motion.div style={{ x, display: "flex", gap: GAP, willChange: "transform" }}>
+        {doubled.map((module, index) => (
+          <motion.div key={index} whileHover={{ scale: 1.04, y: -8 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="flex-shrink-0 relative rounded-2xl overflow-hidden group cursor-default"
+            style={{ width: CARD_W, minHeight: 260 }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.08] to-white/[0.02] border border-white/10 rounded-2xl group-hover:border-[#dc2626]/40 transition-colors duration-300" />
+            <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-[#dc2626]/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="relative p-7">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#dc2626]/20 to-[#dc2626]/5 flex items-center justify-center text-[#ef4444] mb-5 group-hover:scale-110 group-hover:from-[#dc2626]/30 transition-all duration-200">
+                {module.icon}
+              </div>
+              <h3 className="text-white font-bold text-base mb-4 leading-snug">{module.title}</h3>
+              <ul className="space-y-2">
+                {module.features.map((f, i) => (
+                  <li key={i} className="flex items-center gap-2 text-slate-400 text-xs">
+                    <span className="w-1 h-1 rounded-full bg-[#dc2626]/70 flex-shrink-0" />{f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
+/* ─── OverviewBox ─────────────────────────── */
+function OverviewBox({ fullDescription, longDescription, className = "" }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const sentences1 = fullDescription.match(/[^.!?]+[.!?]+/g) || [fullDescription];
+  const sentences2 = longDescription.match(/[^.!?]+[.!?]+/g) || [longDescription];
+  return (
+    <div ref={ref} className={className}>
+      <motion.div className="relative rounded-3xl overflow-hidden"
+        initial={{ opacity: 0, scale: 0.97 }}
+        animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.97 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="absolute inset-0 bg-white/[0.04] backdrop-blur-sm border border-white/10 rounded-3xl" />
+        <div className="absolute left-0 top-12 bottom-12 w-px bg-gradient-to-b from-transparent via-[#dc2626] to-transparent" />
+        <motion.div className="absolute inset-0 origin-left z-10 pointer-events-none rounded-3xl"
+          style={{ background: "linear-gradient(135deg,#0a0f1e 0%,#111827 100%)" }}
+          initial={{ scaleX: 1 }} animate={isInView ? { scaleX: 0 } : { scaleX: 1 }}
+          transition={{ duration: 0.9, delay: 0.2, ease: [0.76, 0, 0.24, 1] }}
+        />
+        <motion.div className="absolute inset-0 origin-right z-10 pointer-events-none rounded-3xl"
+          style={{ background: "linear-gradient(225deg,#0a0f1e 0%,#111827 100%)" }}
+          initial={{ scaleX: 1 }} animate={isInView ? { scaleX: 0 } : { scaleX: 1 }}
+          transition={{ duration: 0.9, delay: 0.2, ease: [0.76, 0, 0.24, 1] }}
+        />
+        <div className="relative p-10 lg:p-16 pl-14 lg:pl-20">
+          <motion.div initial={{ opacity: 0, y: -16 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -16 }} transition={{ duration: 0.5, delay: 0.9 }}>
+            <p className="text-[#dc2626] text-xs font-bold tracking-[0.25em] uppercase mb-3">About This Solution</p>
+            <h2 className="text-3xl font-bold text-white mb-2 relative">
+              Overview
+              <motion.div className="absolute -bottom-3 left-0 h-px bg-gradient-to-r from-[#dc2626] to-transparent"
+                initial={{ width: 0 }} animate={isInView ? { width: 72 } : { width: 0 }}
+                transition={{ duration: 0.6, delay: 1.1 }}
+              />
+            </h2>
+          </motion.div>
+          <div className="mt-10 space-y-5">
+            <p className="text-slate-300 text-base leading-[2] text-justify">
+              {sentences1.map((s, i) => (
+                <motion.span key={i} className="inline"
+                  initial={{ opacity: 0, y: 8 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+                  transition={{ duration: 0.5, delay: 1.05 + i * 0.15 }}
+                >{s}</motion.span>
+              ))}
+            </p>
+            <p className="text-slate-400 text-base leading-[2] text-justify">
+              {sentences2.map((s, i) => (
+                <motion.span key={i} className="inline"
+                  initial={{ opacity: 0, y: 8 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+                  transition={{ duration: 0.5, delay: 1.05 + sentences1.length * 0.15 + i * 0.15 }}
+                >{s}</motion.span>
+              ))}
+            </p>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   MAIN PAGE
+═══════════════════════════════════════════ */
+export default function EInvoicing() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+    requestAnimationFrame(() => setReady(true));
+  }, []);
+
+  const { scrollYProgress } = useScroll();
+  const { scrollY } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 180, damping: 28 });
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const rawParallax = useTransform(scrollY, [0, 600], [0, 100]);
+  const heroImgY = isMobile ? 0 : rawParallax;
+
+  const whatsappNumber = "966535141447";
   const whatsappMessage = "Hello! I'm interested in checking my ZATCA compliance status for your E-Invoicing solution. Can you please provide more information?";
+  const handleWhatsAppClick = () =>
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`, "_blank");
 
-  // Service data
   const service = {
-    id: 6,
     title: "E-Invoicing & Compliance",
-    subtitle: "E-Invoicing",
-    tagline: "Simplify Compliance. Integrate Seamlessly. Avoid Penalties.",
-    description: "Simplify Compliance. Integrate Seamlessly. Avoid Penalties. Navigate ZATCA regulations with confidence through our automated, secure, and audit-ready e-invoicing solution.",
-    gradient: "from-[#dc2626] to-[#ef4444]",
     imageUrl: complianceImage,
+    description: "Simplify Compliance. Integrate Seamlessly. Avoid Penalties. Navigate ZATCA regulations with confidence through our automated, secure, and audit-ready e-invoicing solution.",
     fullDescription: "Navigating the complexities of tax regulations—specifically the ZATCA e-invoicing mandates (Phase 1 & Phase 2)—can be daunting for any business. Our solution transforms compliance from a burden into a seamless background process. We don't just generate invoices; we provide a complete ecosystem that integrates directly with your existing hardware, including thermal printers, self-service kiosks, and Point of Sale (POS) terminals. Our system ensures that every invoice generated is cryptographically secured, validated, and archived according to government standards. By automating the connection between your sales data and regulatory portals, we eliminate manual errors and ensure you remain audit-ready at all times.",
     longDescription: "Whether you operate a retail chain, a restaurant, or a B2B enterprise, our solution scales to handle high transaction volumes while maintaining 100% adherence to legal frameworks. From QR code generation to real-time validation, we handle every aspect of ZATCA compliance so you can focus on your business.",
     features: [
@@ -93,375 +216,158 @@ function EInvoicing() {
       "Secure cloud and local archiving",
       "Offline mode with automatic sync",
       "Multi-branch and multi-device support",
-      "Audit-ready reporting and export options"
+      "Audit-ready reporting and export options",
     ],
     modules: [
-      {
-        title: "ZATCA (Fatoora) Compliance",
-        icon: <FaFileInvoice className="w-6 h-6" />,
-        features: [
-          "Phase 1 & 2 Readiness",
-          "Smart Validation",
-          "QR Code Generation",
-          "Clearance & Reporting",
-          "Cryptographic Signatures",
-          "XML Format Compliance"
-        ]
-      },
-      {
-        title: "Device & Hardware Integration",
-        icon: <FaPrint className="w-6 h-6" />,
-        features: [
-          "Universal Printer Support",
-          "POS Connectivity",
-          "Kiosk Integration",
-          "IoT Connectivity",
-          "Thermal Printer Support",
-          "Self-Service Terminals"
-        ]
-      },
-      {
-        title: "Tax Management & Reporting",
-        icon: <FaChartLine className="w-6 h-6" />,
-        features: [
-          "VAT Automation",
-          "Return Filing",
-          "Audit Trails",
-          "Multi-Format Export",
-          "Tax Calculation",
-          "Compliance Reports"
-        ]
-      },
-      {
-        title: "Security & Archiving",
-        icon: <FaShieldAlt className="w-6 h-6" />,
-        features: [
-          "Tamper-Proofing",
-          "Local & Cloud Archiving",
-          "Data Privacy",
-          "Offline Mode",
-          "Automated Backup",
-          "Secure Storage"
-        ]
-      },
-      {
-        title: "Invoice Management",
-        icon: <FiFileText className="w-6 h-6" />,
-        features: [
-          "Invoice Generation",
-          "Credit/Debit Notes",
-          "Bulk Processing",
-          "Template Customization",
-          "Invoice Tracking",
-          "Payment Integration"
-        ]
-      },
-      {
-        title: "Integration & API",
-        icon: <FaProjectDiagram className="w-6 h-6" />,
-        features: [
-          "ERP Integration",
-          "Accounting Software Sync",
-          "RESTful API",
-          "Webhook Support",
-          "Legacy System Integration",
-          "Real-time Data Sync"
-        ]
-      }
+      { title: "ZATCA (Fatoora) Compliance", icon: <FaFileInvoice className="w-5 h-5" />, features: ["Phase 1 & 2 Readiness","Smart Validation","QR Code Generation","Clearance & Reporting","Cryptographic Signatures","XML Format Compliance"] },
+      { title: "Device & Hardware Integration", icon: <FaPrint className="w-5 h-5" />, features: ["Universal Printer Support","POS Connectivity","Kiosk Integration","IoT Connectivity","Thermal Printer Support","Self-Service Terminals"] },
+      { title: "Tax Management & Reporting", icon: <FaChartLine className="w-5 h-5" />, features: ["VAT Automation","Return Filing","Audit Trails","Multi-Format Export","Tax Calculation","Compliance Reports"] },
+      { title: "Security & Archiving", icon: <FaShieldAlt className="w-5 h-5" />, features: ["Tamper-Proofing","Local & Cloud Archiving","Data Privacy","Offline Mode","Automated Backup","Secure Storage"] },
+      { title: "Invoice Management", icon: <FiFileText className="w-5 h-5" />, features: ["Invoice Generation","Credit/Debit Notes","Bulk Processing","Template Customization","Invoice Tracking","Payment Integration"] },
+      { title: "Integration & API", icon: <FaProjectDiagram className="w-5 h-5" />, features: ["ERP Integration","Accounting Software Sync","RESTful API","Webhook Support","Legacy System Integration","Real-time Data Sync"] },
     ],
     stats: [
-      { value: "100%", label: "ZATCA Compliant", icon: FiShield },
+      { value: "100%",  label: "ZATCA Compliant",    icon: FiShield },
       { value: "99.9%", label: "Uptime Reliability", icon: FiServer },
       { value: "1000+", label: "Invoices Processed", icon: FiFileText },
-      { value: "50ms", label: "Average Response Time", icon: FiClock }
+      { value: "50ms",  label: "Avg Response Time",  icon: FiClock },
     ],
-    benefits: [
-      "Eliminate manual errors in invoice generation",
-      "Stay audit-ready with automated record keeping",
-      "Integrate seamlessly with existing hardware",
-      "Avoid penalties with real-time validation",
-      "Support for high-volume transaction processing",
-      "Offline mode ensures business continuity",
-      "Multi-branch management from one dashboard",
-      "Future-proof against regulatory changes"
-    ]
-  };
-
-  // Function to handle WhatsApp click
-  const handleWhatsAppClick = () => {
-    const encodedMessage = encodeURIComponent(whatsappMessage);
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-    window.open(whatsappUrl, '_blank');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white relative overflow-hidden">
-      {/* Animated Background Effects */}
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px]"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-[#dc2626]/5 via-transparent to-[#dc2626]/5 rounded-full blur-3xl"></div>
-      </motion.div>
+    <div className="min-h-screen bg-[#06080f] relative overflow-hidden"
+      style={{ fontFamily: "'DM Sans', 'Segoe UI', sans-serif", visibility: ready ? "visible" : "hidden" }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap');
+        @keyframes spin-slow { to { transform: rotate(360deg); } }
+        @keyframes spin-rev  { to { transform: rotate(-360deg); } }
+      `}</style>
 
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px]"
-        animate={{ rotate: -360 }}
-        transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-[#dc2626]/5 via-transparent to-[#dc2626]/5 rounded-full blur-2xl"></div>
-      </motion.div>
+      {/* Scroll bar */}
+      <motion.div className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#dc2626] via-[#ef4444] to-[#dc2626] origin-left z-50" style={{ scaleX }} />
 
-      {/* Animated Stars */}
-      <div className="absolute inset-0 overflow-hidden">
-        {stars.map((star) => (
-          <motion.div
-            key={star.id}
-            className="absolute rounded-full bg-[#0a2472]"
-            style={{
-              left: `${star.x}%`,
-              top: `${star.y}%`,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
-              boxShadow: '0 0 4px 1px rgba(10, 36, 114, 0.3)'
-            }}
-            animate={{
-              opacity: [0, 0.5, 0],
-              scale: [0, 1, 0],
-            }}
-            transition={{
-              duration: star.duration,
-              repeat: Infinity,
-              delay: star.delay,
-              ease: "easeInOut"
-            }}
-          />
-        ))}
+      {/* Background atmosphere */}
+      <div className="absolute top-[-200px] left-[-200px] w-[700px] h-[700px] bg-[#dc2626]/[0.06] rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-[-200px] right-[-200px] w-[600px] h-[600px] bg-[#1e3a8a]/[0.12] rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-[#dc2626]/[0.02] rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.018]"
+        style={{ backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px)", backgroundSize: "60px 60px" }} />
+
+      {/* Spinning rings */}
+      <div className="hidden md:block absolute top-[4%] right-[4%] w-72 h-72 opacity-[0.05] pointer-events-none" style={{ animation: "spin-slow 22s linear infinite" }}>
+        <div className="w-full h-full rounded-full border-2 border-dashed border-[#dc2626]" />
+      </div>
+      <div className="hidden md:block absolute top-[8%] right-[8%] w-44 h-44 opacity-[0.04] pointer-events-none" style={{ animation: "spin-rev 15s linear infinite" }}>
+        <div className="w-full h-full rounded-full border border-[#ef4444]" />
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        {/* Back to Services Link */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8"
-        >
-          <Link 
-            to="/" 
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-[#dc2626] transition-colors group"
-          >
-            <FiArrowRight className="rotate-180 group-hover:-translate-x-1 transition-transform" />
-            <span>Back to All Services</span>
-          </Link>
-        </motion.div>
-
-        {/* Hero Section with Image - Small E-Invoicing text REMOVED */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="relative mb-16"
-        >
-          <div className="relative h-[400px] rounded-3xl overflow-hidden">
-            <img 
-              src={service.imageUrl}
-              alt={service.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent"></div>
-            
-            {/* REMOVED: Service Badge section with small "E-Invoicing" text */}
-
-            {/* Title and Description */}
-            <div className="absolute bottom-8 left-8 right-8">
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                {service.title}
-              </h1>
-              <p className="text-white/90 text-lg max-w-3xl">
-                {service.tagline}
-              </p>
-            </div>
+      <div className="relative z-10">
+        {/* ── HERO ── */}
+        <div className="relative h-[100vh] max-h-[720px] min-h-[560px] overflow-hidden">
+          <div className="absolute right-0 top-0 bottom-0 w-full lg:w-[65%]">
+            <motion.img src={service.imageUrl} alt={service.title}
+              className="w-full h-full object-cover" style={{ y: heroImgY }} />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#06080f] via-[#06080f]/80 to-[#06080f]/30 md:to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#06080f] via-transparent to-[#06080f]/20" />
           </div>
-        </motion.div>
-
-        {/* Stats Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16"
-        >
-          {service.stats.map((stat, index) => (
-            <div key={index} className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 text-center hover:shadow-xl transition-shadow">
-              <stat.icon className="w-8 h-8 text-[#dc2626] mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-              <div className="text-sm text-gray-600">{stat.label}</div>
-            </div>
-          ))}
-        </motion.div>
-
-        {/* Full Description */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="bg-white rounded-3xl shadow-xl p-8 lg:p-12 mb-16 border border-gray-200"
-        >
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 relative">
-            Simplify Compliance. Integrate Seamlessly. Avoid Penalties.
-            <div className="absolute -bottom-2 left-0 w-20 h-1 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-full"></div>
-          </h2>
-          <p className="text-gray-700 text-lg leading-relaxed mb-6 text-justify">
-            {service.fullDescription}
-          </p>
-          <p className="text-gray-700 text-lg leading-relaxed text-justify">
-            {service.longDescription}
-          </p>
-        </motion.div>
-
-        {/* Core Modules */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="mb-16"
-        >
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 relative inline-block">
-            Core Modules We Deliver
-            <div className="absolute -bottom-2 left-0 w-20 h-1 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-full"></div>
-          </h2>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {service.modules.map((module, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 * index }}
-                className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-all duration-300 hover:border-[#dc2626]/30 group"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-[#dc2626]/10 rounded-lg text-[#dc2626] group-hover:scale-110 transition-transform">
-                    {module.icon}
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900">{module.title}</h3>
-                </div>
-                <ul className="space-y-2">
-                  {module.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-2 text-gray-600">
-                      <FiCheckCircle className="w-4 h-4 text-[#dc2626] flex-shrink-0 mt-1" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+          <motion.div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent skew-x-12 pointer-events-none z-10"
+            initial={{ x: "-150%" }} animate={{ x: "200%" }}
+            transition={{ duration: 1.6, delay: 0.6, ease: "easeInOut" }}
+          />
+          <div className="relative z-20 h-full flex flex-col justify-center max-w-6xl mx-auto px-6 lg:px-12">
+            <div className="max-w-xl">
+              <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} className="mb-10">
+                <Link to="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-[#ef4444] transition-colors group text-sm">
+                  <FiArrowRight className="rotate-180 group-hover:-translate-x-1 transition-transform w-4 h-4" />
+                  All Services
+                </Link>
               </motion.div>
+              <div className="flex items-center gap-3 mb-6 overflow-hidden">
+                <motion.span className="h-px bg-gradient-to-r from-[#dc2626] to-[#ef4444]"
+                  initial={{ width: 0 }} animate={{ width: 36 }} transition={{ duration: 0.6, delay: 0.3 }} />
+                <motion.span initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
+                  className="text-[#ef4444] text-xs font-bold tracking-[0.3em] uppercase"
+                >E-Invoicing Solution</motion.span>
+              </div>
+              <h1 className="text-5xl lg:text-6xl font-bold text-white mb-6 leading-[1.05] flex flex-wrap gap-x-4 gap-y-1">
+                {service.title.split(" ").map((word, i) => (
+                  <span key={i} className="overflow-hidden inline-block" style={{ paddingBottom: "0.05em" }}>
+                    <motion.span className="inline-block"
+                      initial={{ y: "110%" }} animate={{ y: "0%" }}
+                      transition={{ duration: 0.65, delay: 0.5 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                    >{word}</motion.span>
+                  </span>
+                ))}
+              </h1>
+              <motion.p className="text-slate-400 text-base leading-relaxed mb-10 max-w-md"
+                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 1.0 }}
+              >{service.description}</motion.p>
+              <motion.div className="flex flex-wrap gap-4"
+                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 1.2 }}
+              >
+                <button onClick={handleWhatsAppClick}
+                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-[#dc2626]/20 text-sm group">
+                  Check Your Compliance
+                  <FiArrowRight className="group-hover:translate-x-1 transition-transform w-4 h-4" />
+                </button>
+                <Link to="/contact"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-white/[0.07] hover:bg-white/[0.12] border border-white/15 text-white font-semibold rounded-xl transition-all duration-300 text-sm">
+                  Contact Sales
+                </Link>
+              </motion.div>
+            </div>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#06080f] to-transparent z-10" />
+        </div>
+
+        {/* ── Stats ── */}
+        <div className="relative z-10 max-w-6xl mx-auto px-6 lg:px-12 -mt-6 mb-24">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {service.stats.map((stat, i) => (
+              <FadeUp key={i} delay={i * 0.08}>
+                <div className="relative rounded-2xl overflow-hidden group cursor-default">
+                  <div className="absolute inset-0 bg-white/[0.04] border border-white/10 rounded-2xl group-hover:border-[#dc2626]/30 transition-colors duration-300" />
+                  <div className="relative p-6 text-center">
+                    <div className="w-9 h-9 rounded-lg bg-[#dc2626]/10 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:bg-[#dc2626]/20 transition-all duration-200">
+                      <stat.icon className="w-4 h-4 text-[#ef4444]" />
+                    </div>
+                    <div className="text-3xl font-bold text-white mb-1 tracking-tight"><Counter value={stat.value} /></div>
+                    <div className="text-slate-500 text-[10px] font-semibold tracking-widest uppercase">{stat.label}</div>
+                  </div>
+                </div>
+              </FadeUp>
             ))}
           </div>
-        </motion.div>
+        </div>
 
-        {/* Features List */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="bg-white rounded-3xl shadow-xl p-8 lg:p-12 mb-16 border border-gray-200"
-        >
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 relative">
-            Key Features
-            <div className="absolute -bottom-2 left-0 w-20 h-1 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-full"></div>
-          </h2>
-          
-          <div className="grid md:grid-cols-2 gap-4">
-            {service.features.map((feature, index) => (
-              <div key={index} className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                <FiCheckCircle className="w-5 h-5 text-[#dc2626] flex-shrink-0 mt-0.5" />
-                <span className="text-gray-700">{feature}</span>
+        {/* ── Overview ── */}
+        <div className="max-w-6xl mx-auto px-6 lg:px-12 mb-28">
+          <OverviewBox fullDescription={service.fullDescription} longDescription={service.longDescription} />
+        </div>
+
+        {/* ── Core Modules ── */}
+        <div className="mb-28">
+          <div className="max-w-6xl mx-auto px-6 lg:px-12 mb-10">
+            <FadeUp>
+              <p className="text-[#dc2626] text-xs font-bold tracking-[0.25em] uppercase mb-2">What We Offer</p>
+              <div className="flex items-end justify-between">
+                <h2 className="text-3xl font-bold text-white relative inline-block">
+                  Core Modules
+                  <div className="absolute -bottom-2 left-0 w-12 h-px bg-gradient-to-r from-[#dc2626] to-transparent" />
+                </h2>
+
               </div>
-            ))}
+            </FadeUp>
           </div>
-        </motion.div>
-
-        {/* CTA Section - Updated with WhatsApp buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
-          className="text-center"
-        >
-          <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl p-10 border border-gray-200">
-            <FaRocket className="w-12 h-12 text-[#dc2626] mx-auto mb-4" />
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Ready to Simplify Your Compliance?
-            </h2>
-            <p className="text-gray-600 mb-8 text-lg">
-              Check your ZATCA compliance status today and avoid penalties.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {/* Check Your Compliance button - Opens WhatsApp */}
-              <button
-                onClick={handleWhatsAppClick}
-                className="inline-flex items-center gap-2 px-8 py-4 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl group cursor-pointer"
-              >
-                <span>Check Your Compliance</span>
-                <FiArrowRight className="group-hover:translate-x-1 transition-transform w-5 h-5" />
-              </button>
-              
-              {/* Contact Sales button - Also opens WhatsApp */}
-              <button
-                onClick={handleWhatsAppClick}
-                className="px-8 py-4 bg-transparent border-2 border-gray-200 hover:border-[#dc2626] text-gray-700 hover:text-[#dc2626] font-semibold rounded-xl transition-all duration-300 cursor-pointer"
-              >
-                Contact Sales
-              </button>
-            </div>
+          <div className="relative">
+            <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#06080f] to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#06080f] to-transparent z-10 pointer-events-none" />
+            <div className="py-4"><InfiniteModules modules={service.modules} /></div>
           </div>
-        </motion.div>
-
-        {/* Footer */}
-        <footer className="mt-20 pt-12 border-t border-gray-200">
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            <div className="md:col-span-2">
-              <div className="text-2xl font-bold text-gray-900 mb-3">
-                AIOON Alnajah
-              </div>
-              <p className="text-gray-600 text-sm max-w-md">
-                Automated Lead Generation & Intelligent Automation for Modern Businesses
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-3">Contact</h4>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li className="flex items-center gap-2">
-                  <FiMapPin className="w-4 h-4 text-gray-400" />
-                  Riyadh, Saudi Arabia
-                </li>
-                <li className="flex items-center gap-2">
-                  <FiMail className="w-4 h-4 text-gray-400" />
-                  <a href="mailto:info@aioon.sa" className="hover:text-[#dc2626] transition-colors">
-                    info@aioon.sa
-                  </a>
-                </li>
-                <li className="flex items-center gap-2">
-                  <FiPhone className="w-4 h-4 text-gray-400" />
-                  <a href="tel:+966535141447" className="hover:text-[#dc2626] transition-colors">
-                    +966 53 514 1447
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="pt-6 border-t border-gray-200 text-center text-gray-500 text-xs">
-            © {new Date().getFullYear()} AIOON Technologies. All rights reserved.
-          </div>
-        </footer>
+        </div>   
       </div>
     </div>
   );
 }
-
-export default EInvoicing;
